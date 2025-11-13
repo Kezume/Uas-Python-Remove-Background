@@ -113,6 +113,21 @@ class RemoveBGApp:
     # =======================================================
     # ===     BAGIAN FUNGSI APLIKASI                      ===
     # =======================================================
+        
+    # ------------------------------------------------------------
+    #  Fungsi untuk mengganti background dengan warna
+    #  Tiyas
+    # ------------------------------------------------------------
+    def change_bg_color(self):
+        if not self.removed_image:
+            messagebox.showwarning("Peringatan", "Hapus background dulu!")
+            return
+        color = colorchooser.askcolor(title="Pilih Warna Background")[1]
+        if color:
+            new_img = Image.new("RGBA", self.removed_image.size, color)
+            new_img.paste(self.removed_image, (0, 0), self.removed_image)
+            self.display_image(new_img)
+            self.removed_image = new_img
 
     def display_image(self, img):
         max_width, max_height = 700, 500
