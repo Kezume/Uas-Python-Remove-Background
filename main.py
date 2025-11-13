@@ -182,6 +182,18 @@ class RemoveBGApp:
                 self.loading_text.place_forget()
 
         threading.Thread(target=process).start()
+        
+    def save_image(self):
+        if not self.removed_image:
+            messagebox.showwarning("Peringatan", "Belum ada gambar yang dihapus background-nya!")
+            return
+        save_path = filedialog.asksaveasfilename(
+            defaultextension=".png",
+            filetypes=[("PNG files", "*.png")]
+        )
+        if save_path:
+            self.removed_image.save(save_path)
+            messagebox.showinfo("Sukses", f"Gambar berhasil disimpan di:\n{save_path}")
 
 
     def display_image(self, img):
