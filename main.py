@@ -179,6 +179,35 @@ class RemoveBGApp:
         except Exception as e:
             messagebox.showerror("Error", f"Gagal mengganti background: {e}")
 
+    def gradient_bg(self):
+            self.canvas = tk.Canvas(self.root, highlightthickness=0, bd=0)
+            self.canvas.pack(fill="both", expand=True)
+
+            def draw_gradient(event=None):
+                self.canvas.delete("all")
+                width = self.canvas.winfo_width()
+                height = self.canvas.winfo_height()
+
+                color1 = "#2196f3"
+                color2 = "#e3f2fd"
+                steps = max(height, 1)
+
+                r1, g1, b1 = self.root.winfo_rgb(color1)
+                r2, g2, b2 = self.root.winfo_rgb(color2)
+
+                for i in range(steps):
+                    ratio = i / steps
+                    r = int(r1 + (r2 - r1) * ratio)
+                    g = int(g1 + (g2 - g1) * ratio)
+                    b = int(b1 + (b2 - b1) * ratio)
+                    hex_color = f"#{r>>8:02x}{g>>8:02x}{b>>8:02x}"
+                    self.canvas.create_line(0, i, width, i, fill=hex_color)
+
+                self.canvas.lower("all")
+
+            self.root.bind("<Configure>", draw_gradient)
+            draw_gradient()
+
 if __name__ == "__main__":
     root = tk.Tk()
     app = RemoveBGApp(root)
