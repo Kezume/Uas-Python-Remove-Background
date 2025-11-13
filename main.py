@@ -129,6 +129,52 @@ class RemoveBGApp:
             self.display_image(new_img)
             self.removed_image = new_img
 
+    def remove_bg(self):
+        if not self.image_data:
+            messagebox.showwarning("Peringatan", "Pilih gambar terlebih dahulu!")
+            return
+
+        self.loading_text.place(relx=0.5, rely=0.5, anchor="center")
+
+        def process():
+            try:
+                buffered = io.BytesIO()
+                self.image_data.save(buffered, format="PNG")
+                result = remove(buffered.getvalue())
+                img = Image.open(io.BytesIO(result)).convert("RGBA")
+
+                datas = np.array(img)
+                alpha = datas[:, :, 3].astype(np.uint8)
+                rgb = datas[:, :, :3].astype(np.uint8)
+
+                luminance = (0.299 * rgb[:, :, 0] +
+                             0.587 * rgb[:, :, 1] +
+                             0.114 * rgb[:, :, 2])
+                edge_strength = np.abs(gaussian_laplace(luminance, sigma=1))
+
+                restore_mask = (luminance > 180) & \
+                               (edge_strength > 0.8) & \
+                               (alpha < 100)
+                alpha[restore_mask] = 255
+                alpha = gaussian_filter(alpha, sigma=0.6)
+                datas[:, :, 3] = alpha
+
+                img = Image.fromarray(datas, mode="RGBA")
+                enhancer = ImageEnhance.Contrast(img)
+                img = enhancer.enhance(1.05)
+                img = img.filter(ImageFilter.SMOOTH_MORE)
+
+                self.removed_image = img
+                self.display_image(self.removed_image)
+
+                messagebox.showinfo("Sukses", "Background dihapus")
+
+            finally:
+                self.loading_text.place_forget()
+
+        threading.Thread(target=process).start()
+
+
     def display_image(self, img):
         max_width, max_height = 700, 500
         w, h = img.size
