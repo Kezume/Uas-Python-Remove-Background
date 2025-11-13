@@ -128,6 +128,15 @@ class RemoveBGApp:
             new_img.paste(self.removed_image, (0, 0), self.removed_image)
             self.display_image(new_img)
             self.removed_image = new_img
+            
+    def open_image(self):
+        path = filedialog.askopenfilename(
+            filetypes=[("Image files", "*.png;*.jpg;*.jpeg")]
+        )
+        if not path:
+            return
+        self.image_data = Image.open(path)
+        self.display_image(self.image_data)
 
     def remove_bg(self):
         if not self.image_data:
